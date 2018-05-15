@@ -5,7 +5,7 @@ example.R shows two examples. The first is a times series with 2 changepoints, a
 
 amtc.R is an algorithm designed to detect changepoints from time series with at most two changepoints. 
 
-Suppose that two changepoints are known to occur at time $c_1$,$c_2$, we can use genetic algorithm to discover the optimal solution.
+Suppose that two changepoints are known to occur at time $$c_1$$,$c_2$, we can use genetic algorithm to discover the optimal solution.
 Mutation: add or subtract c_1 or c_2 by a random small amount;
 Crossover: exchange the c_1 and c_2 from two selected solutions.
 
