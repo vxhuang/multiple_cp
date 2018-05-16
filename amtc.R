@@ -79,10 +79,10 @@ amtc <- function(dt, input_no) {
   # GA starts here
   maxiter <- 10
   n_pop <- 200
+  # step <- 5
   elite <- 0.2
   mutprob <- 0.5
   h <- .05
-  
   # mutation operation
   mutate <- function(c, step) {
     c_prime <- c
@@ -163,6 +163,8 @@ amtc <- function(dt, input_no) {
     var_delta <- sigma_2 / (c * (1-c/n) * (1-3*c*(n-c)/(n^2-1)))
     return(delta_hat_c^2 /var_delta)
   }
+  test <- sapply(1:n, T_c, dt = dt)
+  # print(c(test[c[1]], test[c[2]]))
   
   rss_full <- min(scores)^2 * n
   rss_red <- sum(lm(dt$cn ~ dt$no)$residual^2)
@@ -182,15 +184,14 @@ amtc <- function(dt, input_no) {
       mu_hat_c + beta_hat_c * x + delta1_hat_c * ifelse(x > c[1], 1, 0) + delta2_hat_c * ifelse(x > c[2], 1, 0)
     }
 
-    result <- new("changepoint_result", 
-                  plotDT = data.frame("no" = dt$no, "fitted" = lm.cp(dt$no)),
-                  n_cp = 2, 
-                  slope = beta_hat_c,
-                  intercepts = c(mu_hat_c, delta1_hat_c, delta2_hat_c), 
-                  c = c)
+    return(new("changepoint_result", 
+               plotDT = data.frame("no" = dt$no, "fitted" = lm.cp(dt$no)),
+               n_cp = 2, 
+               slope = beta_hat_c,
+               intercepts = c(mu_hat_c, delta1_hat_c, delta2_hat_c), 
+               c = c))
     
   } else if(max(test[round(n*h) : round(n * (1-h))]) > 20.114) {          # one changepoint confirmed
-    test <- sapply(1:n, T_c, dt = dt)
     c <- which(test == max(test[round(n*h) : round(n * (1-h))]))[1]
     beta_hat_c <- (sum(dt[1:c, "cn"] * (1:c - (c+1)/2)) + sum(dt[(c+1):n, "cn"] * ((c+1):n - (n*(n+1)-c*(c+1))/(2*(n-c))))) /
       (c*(c+1)*(c-1)/12 + (n-c)*(n-c+1)*(n-c-1)/12)
@@ -201,23 +202,22 @@ amtc <- function(dt, input_no) {
       mu_hat_c + beta_hat_c * x + delta_hat_c * ifelse(x > c, 1, 0)
     }
     
-    result <- new("changepoint_result", 
-                   plotDT = data.frame("no" = dt$no, "fitted" = lm.cp(dt$no)),
-                  n_cp = 1, 
-                  slope = beta_hat_c,
-                  intercepts = c(mu_hat_c, delta_hat_c), 
-                  c = c)
+    return(new("changepoint_result", 
+               plotDT = data.frame("no" = dt$no, "fitted" = lm.cp(dt$no)),
+               n_cp = 1, 
+               slope = beta_hat_c,
+               intercepts = c(mu_hat_c, delta_hat_c), 
+               c = c))
     
   } else {
-    result <- new("changepoint_result", 
-                  plotDT = data.frame("no" = dt$no, "fitted" = lm(cn ~ no, dt)$fitted),
-                  n_cp = 0, 
-                  slope = lm(cn ~ no, dt)$coefficients[2],
-                  intercepts = lm(cn ~ no, dt)$coefficients[1], 
-                  c = numeric(0))
+    return(new("changepoint_result", 
+               plotDT = data.frame("no" = dt$no, "fitted" = lm(cn ~ no, dt)$fitted),
+               n_cp = 0, 
+               slope = lm(cn ~ no, dt)$coefficients[2],
+               intercepts = lm(cn ~ no, dt)$coefficients[1], 
+               c = numeric(0)))
 
   }
-  if(exists("first_date")) result@plotDT$no <- first_date + dt$no - 1
   return(result)
 }
 
