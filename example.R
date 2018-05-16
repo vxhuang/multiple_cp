@@ -8,11 +8,10 @@ dt <- as.data.frame(dt)
 dt$no <- 1 : 1000
 dt <- dt[, c(2,1)]
 names(dt)[2] <- 'cn'
-# dt$no <- as.Date("2014-12-31") + dt$no
 
 result <- amtc(dt)
 plot(dt, type = 'l')
-lines(result@plotDT, col = 'red')
+lines(result@plotDT$fitted, col = 'red')
 
 # generate a dataset with 1 changepoint
 dt <- 1 : 1e3 * 0.1
@@ -24,5 +23,5 @@ dt <- dt[, c(2,1)]
 names(dt)[2] <- 'cn'
 result <- amtc(dt)
 plot(dt, type = 'l')
-lines(result@plotDT, col = 'red')
+lines(result@plotDT$fitted, col = 'red')
 
